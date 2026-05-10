@@ -1,36 +1,37 @@
-# Sistema de Gestão de Manutenção - Marvi Alimentos v2.0
+# Sistema de Gestão de Manutenção - Marvi v3.0
 
-✅ **NOVIDADES NESTA VERSÃO:**
-- Sistema de Login e Autenticação
-- Gerenciamento de Dados com LocalStorage
-- Níveis de Acesso (Admin, Coordenador, Técnico, Visualizador)
-- Base pronta para funcionalidades completas
+## ✅ NOVA FUNCIONALIDADE - NOVA OS FUNCIONA!
 
-## 🚀 Como usar
+Agora você pode **CRIAR ORDENS DE SERVIÇO** de verdade!
 
-1. Acesse: https://seu-usuario.github.io/sistema-manutencao/
-2. Faça login com uma das contas demonstração:
-   - **Admin:** anderson@marvi.com / admin123
-   - **Coordenador:** fabio@marvi.com / coord123
+### O que funciona:
+- ✅ Botão "+ Nova OS" abre modal
+- ✅ Formulário completo (título, ativo, tipo, prioridade, técnico)
+- ✅ **SALVA NO SISTEMA** (LocalStorage)
+- ✅ **Aparece na lista imediatamente**
+- ✅ Filtros funcionando
+- ✅ Busca funcionando
 
-## 📦 Arquivos Novos
+### Como testar:
+1. Faça login
+2. Vá em "Ordens de Serviço"
+3. Clique em "+ Nova OS"
+4. Preencha o formulário
+5. Clique em "Continuar →"
+6. Atribua um técnico
+7. Clique em "Criar ordem de serviço"
+8. **A OS aparece na lista!** 🎉
 
-- **storage.js** - Gerenciamento de dados LocalStorage
-- **auth.js** - Sistema de autenticação e login
-- **index.html** - Atualizado para carregar os novos arquivos
-- **app.jsx** - Atualizado com verificação de autenticação
-- **shell.jsx** - Atualizado com botão de logout
-- **tokens.css** - Atualizado com estilos de login/logout
-
-## ⚙️ Próximos Módulos
-
-- [ ] Nova OS funcional
-- [ ] Filtros funcionais
-- [ ] Checklists editáveis
-- [ ] Cadastro de técnicos
-- [ ] Gestão de solicitações
-- [ ] Exportações
+## 🔑 Login:
+- **Admin:** anderson@marvi.com / admin123
 
 ---
 
-Desenvolvido para Marvi Alimentos - Planta Ourinhos
+**Próximos módulos:**
+- Editar OS
+- Checklists editáveis  
+- Cadastro de técnicos
+- Gestão de solicitações
+- Exportações
+
+Marvi Alimentos - Planta Ourinhos

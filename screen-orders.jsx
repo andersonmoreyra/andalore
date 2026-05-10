@@ -3,25 +3,44 @@
 function WorkOrdersScreen({ selectedId, onSelect }) {
   const [filter, setFilter] = React.useState("todas");
   const [search, setSearch] = React.useState("");
+  const [workOrders, setWorkOrders] = React.useState([]);
+
+  // Carregar ordens do Storage
+  const loadWorkOrders = () => {
+    const orders = Storage.getWorkOrders();
+    setWorkOrders(orders);
+  };
+
+  // Carregar na montagem
+  React.useEffect(() => {
+    loadWorkOrders();
+  }, []);
+
+  // Escutar evento de refresh
+  React.useEffect(() => {
+    const handleRefresh = () => loadWorkOrders();
+    window.addEventListener('__refresh_work_orders', handleRefresh);
+    return () => window.removeEventListener('__refresh_work_orders', handleRefresh);
+  }, []);
 
   const filters = [
-    { id: "todas", label: "Todas", count: WORK_ORDERS.length },
-    { id: "executando", label: "Em execução", count: WORK_ORDERS.filter(w => w.status === "executando").length },
-    { id: "aberta", label: "Abertas", count: WORK_ORDERS.filter(w => w.status === "aberta").length },
-    { id: "aguardando", label: "Aguardando peça", count: WORK_ORDERS.filter(w => w.status === "aguardando peça").length },
-    { id: "atrasadas", label: "Atrasadas", count: 3 },
+    { id: "todas", label: "Todas", count: workOrders.length },
+    { id: "executando", label: "Em execução", count: workOrders.filter(w => w.status === "executando").length },
+    { id: "aberta", label: "Abertas", count: workOrders.filter(w => w.status === "aberta").length },
+    { id: "aguardando", label: "Aguardando peça", count: workOrders.filter(w => w.status === "aguardando peça").length },
+    { id: "atrasadas", label: "Atrasadas", count: workOrders.filter(w => w.sla && w.sla > 0.7).length },
   ];
 
-  const items = WORK_ORDERS.filter((w) => {
+  const items = workOrders.filter((w) => {
     if (filter === "executando" && w.status !== "executando") return false;
     if (filter === "aberta" && w.status !== "aberta") return false;
     if (filter === "aguardando" && w.status !== "aguardando peça") return false;
-    if (filter === "atrasadas" && w.sla < 0.7) return false;
-    if (search && !(`${w.id} ${w.title} ${w.assetName}`.toLowerCase().includes(search.toLowerCase()))) return false;
+    if (filter === "atrasadas" && (!w.sla || w.sla < 0.7)) return false;
+    if (search && !(`${w.id} ${w.titulo} ${w.equipamentoNome}`.toLowerCase().includes(search.toLowerCase()))) return false;
     return true;
   });
 
-  const selected = WORK_ORDERS.find(w => w.id === selectedId) || items[0];
+  const selected = workOrders.find(w => w.id === selectedId) || items[0];
 
   return (
     <div className="wo-screen">
@@ -36,7 +55,7 @@ function WorkOrdersScreen({ selectedId, onSelect }) {
                      value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
             <button className="btn">{I.filter}<span>Filtros</span></button>
-            <button className="btn btn-primary">{I.plus}<span>Nova OS</span></button>
+            <button className="btn btn-primary" onClick={() => window.dispatchEvent(new CustomEvent("__open_new_wo"))}>{I.plus}<span>Nova OS</span></button>
           </div>
         </div>
         <div className="wo-tabs">
@@ -63,33 +82,33 @@ function WorkOrdersScreen({ selectedId, onSelect }) {
                     onClick={() => onSelect(w.id)}>
               <span className="mono wo-cell-id">{w.id}</span>
               <span className="wo-cell-title">
-                <span className="wo-title-main">{w.title}</span>
+                <span className="wo-title-main">{w.titulo}</span>
                 <span className="wo-title-asset">
-                  <span className="mono">{w.asset}</span> · {w.assetName}
+                  <span className="mono">{w.equipamento}</span> · {w.equipamentoNome}
                 </span>
               </span>
-              <span><span className="pill" data-tone={toneType(w.type)}>{w.type}</span></span>
-              <span><span className="pill" data-tone={tonePriority(w.priority)}>
-                <span className="dot" />{w.priority}
+              <span><span className="pill" data-tone={toneType(w.tipo)}>{w.tipo}</span></span>
+              <span><span className="pill" data-tone={tonePriority(w.prioridade)}>
+                <span className="dot" />{w.prioridade}
               </span></span>
               <span className="wo-cell-assignee">
-                {w.assignee ? (
+                {w.tecnico ? (
                   <>
                     <span className="avatar avatar-xs"
-                          style={{ background: TECHNICIANS.find(t => t.id === w.assignee)?.color }}>
-                      {TECHNICIANS.find(t => t.id === w.assignee)?.initials}
+                          style={{ background: TECHNICIANS.find(t => t.id === w.tecnico)?.color }}>
+                      {TECHNICIANS.find(t => t.id === w.tecnico)?.initials}
                     </span>
-                    <span>{w.assigneeName.split(" ")[0]}</span>
+                    <span>{w.tecnicoNome?.split(" ")[0] || 'Técnico'}</span>
                   </>
                 ) : <span className="ink-3">Não atribuído</span>}
               </span>
               <span className="wo-cell-sla">
-                <div className="bar bar-sm" data-tone={w.sla > 0.7 ? "crit" : w.sla > 0.4 ? "warn" : "good"}>
-                  <i style={{ width: `${w.sla * 100}%` }} />
+                <div className="bar bar-sm" data-tone={(w.sla || 0) > 0.7 ? "crit" : (w.sla || 0) > 0.4 ? "warn" : "good"}>
+                  <i style={{ width: `${(w.sla || 0) * 100}%` }} />
                 </div>
-                <span className="mono">{Math.round(w.sla * 100)}%</span>
+                <span className="mono">{Math.round((w.sla || 0) * 100)}%</span>
               </span>
-              <span className="mono ink-2">{w.due.split(" ")[1]}</span>
+              <span className="mono ink-2">{w.prazo?.split(" ")[1] || '--:--'}</span>
             </button>
           ))}
         </div>

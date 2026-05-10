@@ -55,14 +55,43 @@ function NewWOModal() {
 
   const submit = () => {
     setSubmitting(true);
+    
+    // Buscar dados do ativo selecionado
+    const asset = ASSETS.find(a => a.id === form.asset);
+    
+    // Buscar dados do técnico selecionado
+    const tech = TECHNICIANS.find(t => t.id === form.assignee);
+    
+    // Criar objeto da nova OS
+    const newWO = {
+      titulo: form.title,
+      descricao: form.description || '',
+      equipamento: form.asset,
+      equipamentoNome: asset?.name || form.asset,
+      area: asset?.area || 'N/A',
+      tipo: form.type,
+      prioridade: form.priority,
+      tecnico: form.assignee || null,
+      tecnicoNome: tech?.name || null,
+      estimativa: form.estimatedTime,
+      solicitante: form.requestedBy,
+      status: 'aberta',
+      anexos: form.attachments
+    };
+    
+    // Salvar no Storage
+    const savedWO = Storage.addWorkOrder(newWO);
+    
     setTimeout(() => {
-      const nextId = "OS-" + (4521 + Math.floor(Math.random() * 99));
       setOpen(false);
       window.showToast?.(
-        `Ordem ${nextId} criada com sucesso`,
+        `Ordem ${savedWO.id} criada com sucesso!`,
         "good",
-        `${form.title} · ${form.priority} · atribuída a ${form.assignee || "—"}`
+        `${savedWO.titulo} · ${savedWO.prioridade} · ${savedWO.tecnicoNome || 'não atribuída'}`
       );
+      
+      // Recarregar a tela para mostrar a nova OS
+      window.dispatchEvent(new CustomEvent('__refresh_work_orders'));
     }, 600);
   };
 
