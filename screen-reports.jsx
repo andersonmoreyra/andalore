@@ -1,6 +1,33 @@
 // ─── Tela: Relatórios & Indicadores ──────────────────────────────────────────
 // Visão executiva: MTBF, MTTR, disponibilidade, Pareto de falhas, custos, top ofensores
 
+function Sparkline({ values, width, height }) {
+  if (!values || values.length === 0) return null;
+  
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const range = max - min || 1;
+  
+  const points = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * width;
+    const y = height - ((v - min) / range) * height;
+    return `${x},${y}`;
+  }).join(' ');
+  
+  return (
+    <svg width={width} height={height} style={{ display: 'block' }}>
+      <polyline
+        points={points}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 // 12 meses de dados
 const MONTHS = ["Jun","Jul","Ago","Set","Out","Nov","Dez","Jan","Fev","Mar","Abr","Mai"];
 
