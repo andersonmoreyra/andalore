@@ -68,7 +68,7 @@ function TechnicianManager() {
 
         {technicians.length === 0 && (
           <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
-            <div style={{ fontSize: '48px', opacity: 0.3' }}>👥</div>
+            <div style={{ fontSize: '48px', opacity: 0.3 }}>👥</div>
             <div style={{ fontSize: '14px', marginBottom: '16px' }}>Nenhum técnico cadastrado</div>
             <button className="btn btn-primary" onClick={() => setCreating(true)}>
               {I.plus}<span>Adicionar primeiro técnico</span>
