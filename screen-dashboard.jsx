@@ -340,6 +340,7 @@ function DashboardScreen({ onOpenWO, onNav }) {
 }
 
 window.DashboardScreen = DashboardScreen;
+window.Sparkline = Sparkline;
 window.tonePriority = tonePriority;
 window.toneType = toneType;
 window.statusLabel = statusLabel;
