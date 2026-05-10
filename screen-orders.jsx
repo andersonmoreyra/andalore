@@ -4,6 +4,8 @@ function WorkOrdersScreen({ selectedId, onSelect }) {
   const [filter, setFilter] = React.useState("todas");
   const [search, setSearch] = React.useState("");
   const [workOrders, setWorkOrders] = React.useState([]);
+  const [editingWO, setEditingWO] = React.useState(null);
+  const [checklistWO, setChecklistWO] = React.useState(null);
 
   // Carregar ordens do Storage
   const loadWorkOrders = () => {
@@ -116,7 +118,11 @@ function WorkOrdersScreen({ selectedId, onSelect }) {
 
       {/* Detalhe */}
       {selected ? (
-        <WorkOrderDetail wo={selected} />
+        <WorkOrderDetail 
+          wo={selected} 
+          onEdit={() => setEditingWO(selected.id)}
+          onChecklist={() => setChecklistWO(selected.id)}
+        />
       ) : (
         <div className="wo-detail scroll" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '16px', color: 'var(--ink-3)' }}>
           <div style={{ fontSize: '48px', opacity: 0.3 }}>📋</div>
@@ -126,11 +132,35 @@ function WorkOrdersScreen({ selectedId, onSelect }) {
           </button>
         </div>
       )}
+
+      {/* Modal de edição */}
+      {editingWO && (
+        <EditWOModal 
+          woId={editingWO} 
+          onClose={() => setEditingWO(null)} 
+          onSave={() => {
+            loadWorkOrders();
+            setEditingWO(null);
+          }}
+        />
+      )}
+
+      {/* Modal de checklist */}
+      {checklistWO && (
+        <ChecklistExecutor
+          woId={checklistWO}
+          onClose={() => setChecklistWO(null)}
+          onComplete={() => {
+            loadWorkOrders();
+            setChecklistWO(null);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function WorkOrderDetail({ wo }) {
+function WorkOrderDetail({ wo, onEdit, onChecklist }) {
   const technicians = Storage.getTechnicians();
   const tech = technicians.find(t => t.id === wo.tecnico);
   const pct = (wo.estimativa || 0) > 0 ? Math.min(100, ((wo.decorrido || 0) / wo.estimativa) * 100) : 0;
@@ -148,7 +178,8 @@ function WorkOrderDetail({ wo }) {
           <span className="pill" data-tone={toneType(wo.tipo)}>{wo.tipo}</span>
         </div>
         <div className="wo-detail-actions">
-          <button className="btn">{I.pin}<span>Fixar</span></button>
+          <button className="btn" onClick={onChecklist}>✓<span>Checklist</span></button>
+          <button className="btn" onClick={onEdit}>{I.edit}<span>Editar</span></button>
           <button className="btn">{I.more}</button>
         </div>
       </div>

@@ -70,7 +70,7 @@ function ShiftTimeline() {
               <div className="tl-tech-dot" style={{ background: t.color }}>{t.initials}</div>
               <div className="tl-tech-info">
                 <div className="tl-tech-name">{t.name}</div>
-                <div className="tl-tech-role">{t.role}</div>
+                <div className="tl-tech-role">{t.especialidade}</div>
               </div>
             </div>
             <div className="tl-track">

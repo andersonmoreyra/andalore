@@ -110,11 +110,11 @@ const Auth = {
   fillDemoAccount(tipo) {
     const demoAccounts = {
       admin: {
-        email: 'anderson',
+        email: 'anderson@marvi.com',
         senha: 'admin123'
       },
       coordenador: {
-        email: 'coordenador',
+        email: 'fabio@marvi.com',
         senha: 'coord123'
       },
       tecnico: {

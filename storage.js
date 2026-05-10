@@ -370,10 +370,12 @@ const Storage = {
 
   addAsset(asset) {
     const assets = this.getAssets();
-    assets.push(asset);
+    const id = `A${String(assets.length + 1).padStart(2, '0')}`;
+    const newAsset = { id, ...asset };
+    assets.push(newAsset);
     this.set(this.KEYS.ASSETS, assets);
-    this.logActivity('create', 'asset', asset.id, `Ativo ${asset.nome} cadastrado`);
-    return asset;
+    this.logActivity('create', 'asset', newAsset.id, `Ativo ${newAsset.nome} cadastrado`);
+    return newAsset;
   },
 
   updateAsset(assetId, updates) {

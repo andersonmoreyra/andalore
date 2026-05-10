@@ -277,10 +277,7 @@ function NewWOModal() {
                             className="assignee-pick"
                             data-active={form.assignee === t.id}
                             onClick={() => {
-                              console.log('Selecionando técnico:', t.id, t.nome);
-                              console.log('Assignee atual:', form.assignee);
                               set("assignee", t.id);
-                              console.log('Assignee depois:', t.id);
                             }}>
                       <span className="avatar avatar-sm" style={{ background: t.color }}>{t.initials}</span>
                       <div className="assignee-info">
