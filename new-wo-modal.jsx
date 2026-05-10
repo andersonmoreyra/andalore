@@ -275,15 +275,15 @@ function NewWOModal() {
                     <button key={t.id} type="button"
                             data-no-toast="true"
                             className="assignee-pick"
-                            data-active={form.assignee === t.name}
-                            onClick={() => set("assignee", t.name)}>
+                            data-active={form.assignee === t.id}
+                            onClick={() => set("assignee", t.id)}>
                       <span className="avatar avatar-sm" style={{ background: t.color }}>{t.initials}</span>
                       <div className="assignee-info">
-                        <span className="assignee-name">{t.name}</span>
-                        <span className="assignee-role">{t.role}</span>
+                        <span className="assignee-name">{t.nome}</span>
+                        <span className="assignee-role">{t.especialidade}</span>
                       </div>
                       <span className="assignee-pick-state">
-                        {form.assignee === t.name ? "✓ Selecionado" : "Selecionar"}
+                        {form.assignee === t.id ? "✓ Selecionado" : "Selecionar"}
                       </span>
                     </button>
                   ))}
