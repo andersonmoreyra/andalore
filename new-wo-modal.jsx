@@ -18,6 +18,15 @@ function NewWOModal() {
   const [step, setStep] = React.useState(1);
   const dialogRef = React.useRef(null);
   const firstFieldRef = React.useRef(null);
+  
+  // Carregar dados do Storage
+  const [assets, setAssets] = React.useState([]);
+  const [technicians, setTechnicians] = React.useState([]);
+  
+  React.useEffect(() => {
+    setAssets(Storage.getAssets());
+    setTechnicians(Storage.getTechnicians());
+  }, []);
 
   React.useEffect(() => {
     const onOpen = (e) => {
@@ -56,23 +65,27 @@ function NewWOModal() {
   const submit = () => {
     setSubmitting(true);
     
+    // Buscar dados do Storage
+    const assets = Storage.getAssets();
+    const technicians = Storage.getTechnicians();
+    
     // Buscar dados do ativo selecionado
-    const asset = ASSETS.find(a => a.id === form.asset);
+    const asset = assets.find(a => a.id === form.asset);
     
     // Buscar dados do técnico selecionado
-    const tech = TECHNICIANS.find(t => t.id === form.assignee);
+    const tech = technicians.find(t => t.id === form.assignee);
     
     // Criar objeto da nova OS
     const newWO = {
       titulo: form.title,
       descricao: form.description || '',
       equipamento: form.asset,
-      equipamentoNome: asset?.name || form.asset,
+      equipamentoNome: asset?.nome || form.asset,
       area: asset?.area || 'N/A',
       tipo: form.type,
       prioridade: form.priority,
       tecnico: form.assignee || null,
-      tecnicoNome: tech?.name || null,
+      tecnicoNome: tech?.nome || null,
       estimativa: form.estimatedTime,
       solicitante: form.requestedBy,
       status: 'aberta',
@@ -134,8 +147,8 @@ function NewWOModal() {
                   <label className="form-label">Ativo *</label>
                   <select className="form-input" value={form.asset} onChange={(e) => set("asset", e.target.value)}>
                     <option value="">Selecione…</option>
-                    {ASSETS.map(a => (
-                      <option key={a.id} value={a.id}>{a.id} · {a.name}</option>
+                    {assets.map(a => (
+                      <option key={a.id} value={a.id}>{a.codigo} · {a.nome}</option>
                     ))}
                   </select>
                 </div>
@@ -258,7 +271,7 @@ function NewWOModal() {
               <div className="form-row">
                 <label className="form-label">Atribuir a um técnico</label>
                 <div className="assignee-list">
-                  {TECHNICIANS.map(t => (
+                  {technicians.map(t => (
                     <button key={t.id} type="button"
                             data-no-toast="true"
                             className="assignee-pick"

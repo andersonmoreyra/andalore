@@ -121,8 +121,9 @@ function WorkOrdersScreen({ selectedId, onSelect }) {
 }
 
 function WorkOrderDetail({ wo }) {
-  const tech = TECHNICIANS.find(t => t.id === wo.assignee);
-  const pct = wo.estimate > 0 ? Math.min(100, (wo.elapsed / wo.estimate) * 100) : 0;
+  const technicians = Storage.getTechnicians();
+  const tech = technicians.find(t => t.id === wo.tecnico);
+  const pct = (wo.estimativa || 0) > 0 ? Math.min(100, ((wo.decorrido || 0) / wo.estimativa) * 100) : 0;
   const status = statusLabel[wo.status] || { label: wo.status, tone: "neutral" };
 
   return (
@@ -131,56 +132,60 @@ function WorkOrderDetail({ wo }) {
         <div className="wo-detail-meta">
           <span className="mono wo-detail-id">{wo.id}</span>
           <span className="pill" data-tone={status.tone}><span className="dot" />{status.label}</span>
-          <span className="pill" data-tone={tonePriority(wo.priority)}>
-            <span className="dot" />{wo.priority}
+          <span className="pill" data-tone={tonePriority(wo.prioridade)}>
+            <span className="dot" />{wo.prioridade}
           </span>
-          <span className="pill" data-tone={toneType(wo.type)}>{wo.type}</span>
+          <span className="pill" data-tone={toneType(wo.tipo)}>{wo.tipo}</span>
         </div>
         <div className="wo-detail-actions">
           <button className="btn">{I.pin}<span>Fixar</span></button>
           <button className="btn">{I.more}</button>
         </div>
       </div>
-      <h2 className="wo-detail-title">{wo.title}</h2>
+      <h2 className="wo-detail-title">{wo.titulo}</h2>
       <div className="wo-detail-asset">
         <span style={{ color: "var(--ink-3)" }}>{I.asset}</span>
-        <span className="mono">{wo.asset}</span>
+        <span className="mono">{wo.equipamento}</span>
         <span>·</span>
-        <span>{wo.assetName}</span>
+        <span>{wo.equipamentoNome}</span>
         <span style={{ color: "var(--ink-4)" }}>·</span>
         <span style={{ color: "var(--ink-3)" }}>{wo.area}</span>
       </div>
 
-      {/* Cronômetro grande */}
-      <div className="wo-timer">
-        <div className="wo-timer-block">
-          <div className="wo-timer-label">Decorrido</div>
-          <div className="wo-timer-value mono">{fmtMin(wo.elapsed)}</div>
-        </div>
-        <div className="wo-timer-bar">
-          <div className="bar bar-lg" data-tone={pct > 90 ? "crit" : pct > 70 ? "warn" : "accent"}>
-            <i style={{ width: `${pct}%` }} />
+      {/* Cronômetro grande - só mostra se tiver dados de tempo */}
+      {wo.estimativa && (
+        <div className="wo-timer">
+          <div className="wo-timer-block">
+            <div className="wo-timer-label">Decorrido</div>
+            <div className="wo-timer-value mono">{fmtMin(wo.decorrido || 0)}</div>
           </div>
-          <div className="wo-timer-bar-meta">
-            <span className="mono">{Math.round(pct)}% do estimado</span>
-            <span className="mono">restante: {fmtMin(Math.max(0, wo.estimate - wo.elapsed))}</span>
+          <div className="wo-timer-bar">
+            <div className="bar bar-lg" data-tone={pct > 90 ? "crit" : pct > 70 ? "warn" : "accent"}>
+              <i style={{ width: `${pct}%` }} />
+            </div>
+            <div className="wo-timer-bar-meta">
+              <span className="mono">{Math.round(pct)}% do estimado</span>
+              <span className="mono">restante: {fmtMin(Math.max(0, wo.estimativa - (wo.decorrido || 0)))}</span>
+            </div>
+          </div>
+          <div className="wo-timer-block">
+            <div className="wo-timer-label">Estimado</div>
+            <div className="wo-timer-value mono">{fmtMin(wo.estimativa)}</div>
           </div>
         </div>
-        <div className="wo-timer-block">
-          <div className="wo-timer-label">Estimado</div>
-          <div className="wo-timer-value mono">{fmtMin(wo.estimate)}</div>
-        </div>
-      </div>
+      )}
 
-      {/* Impacto */}
-      <div className={`wo-impact ${wo.impact.includes("R$") ? "wo-impact-crit" : ""}`}>
-        <span style={{ color: "var(--crit)" }}>{I.alert}</span>
-        <span>{wo.impact}</span>
-      </div>
+      {/* Impacto - só mostra se tiver */}
+      {wo.impacto && (
+        <div className={`wo-impact ${wo.impacto.includes("R$") ? "wo-impact-crit" : ""}`}>
+          <span style={{ color: "var(--crit)" }}>{I.alert}</span>
+          <span>{wo.impacto}</span>
+        </div>
+      )}
 
       <div className="wo-detail-grid">
         <Section label="Descrição">
-          <p className="wo-desc">{wo.description}</p>
+          <p className="wo-desc">{wo.descricao || 'Sem descrição'}</p>
         </Section>
 
         <Section label="Responsável">
@@ -188,8 +193,8 @@ function WorkOrderDetail({ wo }) {
             <div className="wo-tech-card">
               <div className="avatar avatar-lg" style={{ background: tech.color }}>{tech.initials}</div>
               <div>
-                <div className="wo-tech-name">{tech.name}</div>
-                <div className="wo-tech-role">{tech.role} · <span className="mono">{tech.id}</span></div>
+                <div className="wo-tech-name">{tech.nome}</div>
+                <div className="wo-tech-role">{tech.especialidade} · <span className="mono">{tech.id}</span></div>
               </div>
               <button className="btn btn-mini" style={{ marginLeft: "auto" }}>Reatribuir</button>
             </div>
@@ -200,14 +205,14 @@ function WorkOrderDetail({ wo }) {
 
         <Section label="Datas">
           <dl className="wo-dl">
-            <dt>Aberta</dt><dd className="mono">{wo.opened}</dd>
-            <dt>Prazo</dt><dd className="mono">{wo.due}</dd>
-            <dt>Estimativa</dt><dd className="mono">{fmtMin(wo.estimate)}</dd>
+            <dt>Aberta</dt><dd className="mono">{wo.dataAbertura ? new Date(wo.dataAbertura).toLocaleString('pt-BR') : '--'}</dd>
+            <dt>Prazo</dt><dd className="mono">{wo.prazo ? new Date(wo.prazo).toLocaleString('pt-BR') : '--'}</dd>
+            <dt>Estimativa</dt><dd className="mono">{wo.estimativa ? fmtMin(wo.estimativa) : '--'}</dd>
           </dl>
         </Section>
 
-        <Section label={`Peças & materiais (${wo.parts.length})`}>
-          {wo.parts.length === 0 ? (
+        <Section label={`Peças & materiais (${(wo.pecas || []).length})`}>
+          {(!wo.pecas || wo.pecas.length === 0) ? (
             <div className="ink-3" style={{ fontSize: 12 }}>Nenhum material requerido.</div>
           ) : (
             <table className="parts-table">
@@ -215,14 +220,14 @@ function WorkOrderDetail({ wo }) {
                 <tr><th>Código</th><th>Descrição</th><th>Qtd</th><th>Estoque</th><th></th></tr>
               </thead>
               <tbody>
-                {wo.parts.map((p) => (
-                  <tr key={p.code}>
-                    <td className="mono">{p.code}</td>
-                    <td>{p.name}</td>
-                    <td className="mono">{p.qty}</td>
-                    <td className={`mono ${p.stock < p.qty ? "ink-crit" : ""}`}>{p.stock}</td>
+                {wo.pecas.map((p) => (
+                  <tr key={p.codigo}>
+                    <td className="mono">{p.codigo}</td>
+                    <td>{p.nome}</td>
+                    <td className="mono">{p.quantidade}</td>
+                    <td className={`mono ${(p.estoque || 0) < p.quantidade ? "ink-crit" : ""}`}>{p.estoque || 0}</td>
                     <td>
-                      {p.stock < p.qty
+                      {(p.estoque || 0) < p.quantidade
                         ? <span className="pill" data-tone="crit">sem estoque</span>
                         : <span className="pill" data-tone="good">disponível</span>}
                     </td>
