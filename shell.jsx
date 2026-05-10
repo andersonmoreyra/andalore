@@ -86,11 +86,11 @@ function TopBar({ accent }) {
         <div className="topbar-brand-mark"><BrandMark size={14} /></div>
       </div>
       <div className="topbar-context">
-        <strong>{PLANT.name}</strong>
+        <strong>{PLANT.nome}</strong>
         <span className="ctx-shift">·</span>
-        <span className="ctx-shift">{PLANT.shift}</span>
+        <span className="ctx-shift">{PLANT.turno}</span>
         <span className="ctx-date">·</span>
-        <span className="ctx-date mono">{PLANT.date}</span>
+        <span className="ctx-date mono">{PLANT.data}</span>
       </div>
       <div className="topbar-kpis">
         {KPIS.map((k, i) => (

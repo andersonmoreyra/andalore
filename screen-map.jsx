@@ -21,7 +21,7 @@ function PlantMapScreen({ onOpenWO }) {
   };
 
   const sel = ASSETS.find(a => a.id === selected);
-  const selWOs = WORK_ORDERS.filter(w => w.asset === selected && w.status !== "concluída");
+  const selWOs = WORK_ORDERS.filter(w => w.equipamento === selected && w.status !== "concluída");
 
   return (
     <div className="screen-pad map-screen">
@@ -70,8 +70,8 @@ function PlantMapScreen({ onOpenWO }) {
           {ASSETS.map((a) => {
             const p = positions[a.id];
             if (!p) return null;
-            const tone = a.health > 0.8 ? "good" : a.health > 0.6 ? "warn" : "crit";
-            const hasWO = WORK_ORDERS.some(w => w.asset === a.id && (w.status === "executando" || w.status === "aguardando peça"));
+            const tone = a.saude > 0.8 ? "good" : a.saude > 0.6 ? "warn" : "crit";
+            const hasWO = WORK_ORDERS.some(w => w.equipamento === a.id && (w.status === "executando" || w.status === "aguardando peça"));
             return (
               <button key={a.id} className="map-asset"
                       data-tone={tone}
@@ -81,9 +81,9 @@ function PlantMapScreen({ onOpenWO }) {
                       onMouseEnter={() => setHover(a.id)}
                       onMouseLeave={() => setHover(null)}>
                 <span className="map-asset-id mono">{a.id}</span>
-                <span className="map-asset-name">{a.name}</span>
+                <span className="map-asset-name">{a.nome}</span>
                 <span className="map-asset-bar">
-                  <i style={{ width: `${a.health * 100}%` }} />
+                  <i style={{ width: `${a.saude * 100}%` }} />
                 </span>
                 {hasWO && <span className="map-asset-badge">{I.tool}</span>}
               </button>
@@ -97,14 +97,14 @@ function PlantMapScreen({ onOpenWO }) {
             <>
               <div className="map-side-head">
                 <div className="map-side-id mono">{sel.id}</div>
-                <div className="map-side-name">{sel.name}</div>
-                <div className="map-side-area">{sel.area} · Criticidade {sel.criticality}</div>
+                <div className="map-side-name">{sel.nome}</div>
+                <div className="map-side-area">{sel.area} · Criticidade {sel.criticidade}</div>
               </div>
 
               <div className="map-stats">
-                <Stat label="Saúde" value={`${Math.round(sel.health * 100)}%`}
-                      bar={sel.health}
-                      tone={sel.health > 0.8 ? "good" : sel.health > 0.6 ? "warn" : "crit"} />
+                <Stat label="Saúde" value={`${Math.round(sel.saude * 100)}%`}
+                      bar={sel.saude}
+                      tone={sel.saude > 0.8 ? "good" : sel.saude > 0.6 ? "warn" : "crit"} />
                 <Stat label="Disponibilidade" value={`${sel.runtime}%`} bar={sel.runtime / 100} tone="accent" />
                 <Stat label="MTBF" value={`${sel.mtbf}h`} mono />
               </div>
@@ -117,16 +117,16 @@ function PlantMapScreen({ onOpenWO }) {
                   <button key={w.id} className="map-wo" onClick={() => onOpenWO(w.id)}>
                     <div className="map-wo-h">
                       <span className="mono">{w.id}</span>
-                      <span className="pill" data-tone={tonePriority(w.priority)}>{w.priority}</span>
+                      <span className="pill" data-tone={tonePriority(w.prioridade)}>{w.prioridade}</span>
                     </div>
-                    <div className="map-wo-title">{w.title}</div>
-                    {w.assigneeName && (
+                    <div className="map-wo-title">{w.titulo}</div>
+                    {w.tecnicoNome && (
                       <div className="map-wo-meta">
                         <span className="avatar avatar-xs"
-                              style={{ background: TECHNICIANS.find(t => t.id === w.assignee)?.color }}>
-                          {TECHNICIANS.find(t => t.id === w.assignee)?.initials}
+                              style={{ background: TECHNICIANS.find(t => t.id === w.tecnico)?.color }}>
+                          {TECHNICIANS.find(t => t.id === w.tecnico)?.initials}
                         </span>
-                        <span>{w.assigneeName}</span>
+                        <span>{w.tecnicoNome}</span>
                       </div>
                     )}
                   </button>

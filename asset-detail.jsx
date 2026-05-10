@@ -24,14 +24,14 @@ function generateHealthSeries(currentHealth) {
 // Eventos do timeline (90 dias) — gerados a partir do ativo
 function generateEvents(asset) {
   const base = [
-    { day: 0,  kind: "alert", title: "Vibração acima do limiar", note: "Sensor S-A12 · 6,8 mm/s" },
-    { day: 8,  kind: "wo",    title: `OS-${4500 + (asset.id.charCodeAt(0) % 30)} concluída`, note: "Lubrificação preventiva · 2,4 h" },
-    { day: 22, kind: "insp",  title: "Inspeção de rotina", note: "Termografia · sem ocorrências" },
-    { day: 31, kind: "alert", title: "Temperatura motor elevada", note: "78 °C · normalizado em 12 min" },
-    { day: 47, kind: "wo",    title: "Substituição de rolamento SKF 6308", note: "Corretiva planejada · J. Pereira" },
-    { day: 58, kind: "insp",  title: "Análise de óleo", note: "Viscosidade dentro do esperado" },
-    { day: 73, kind: "alert", title: "Pressão hidráulica baixa", note: "Filtro substituído" },
-    { day: 89, kind: "wo",    title: "OS-4521 aberta", note: "Diagnóstico de vibração crítica" },
+    { day: 0,  kind: "alert", titulo: "Vibração acima do limiar", note: "Sensor S-A12 · 6,8 mm/s" },
+    { day: 8,  kind: "wo",    titulo: `OS-${4500 + (asset.id.charCodeAt(0) % 30)} concluída`, note: "Lubrificação preventiva · 2,4 h" },
+    { day: 22, kind: "insp",  titulo: "Inspeção de rotina", note: "Termografia · sem ocorrências" },
+    { day: 31, kind: "alert", titulo: "Temperatura motor elevada", note: "78 °C · normalizado em 12 min" },
+    { day: 47, kind: "wo",    titulo: "Substituição de rolamento SKF 6308", note: "Corretiva planejada · J. Pereira" },
+    { day: 58, kind: "insp",  titulo: "Análise de óleo", note: "Viscosidade dentro do esperado" },
+    { day: 73, kind: "alert", titulo: "Pressão hidráulica baixa", note: "Filtro substituído" },
+    { day: 89, kind: "wo",    titulo: "OS-4521 aberta", note: "Diagnóstico de vibração crítica" },
   ];
   return base;
 }
@@ -67,11 +67,11 @@ function AssetDetailDrawer({ assetId, onClose, onOpenWO }) {
   const asset = ASSETS.find(a => a.id === assetId);
   if (!asset) return null;
 
-  const series = generateHealthSeries(asset.health);
+  const series = generateHealthSeries(asset.saude);
   const events = generateEvents(asset);
   const components = ASSET_COMPONENTS[asset.id] || ASSET_COMPONENTS.default;
-  const tone = asset.health > 0.8 ? "good" : asset.health > 0.6 ? "warn" : "crit";
-  const wos = WORK_ORDERS.filter(w => w.asset === asset.id);
+  const tone = asset.saude > 0.8 ? "good" : asset.saude > 0.6 ? "warn" : "crit";
+  const wos = WORK_ORDERS.filter(w => w.equipamento === asset.id);
   const openWos = wos.filter(w => w.status !== "concluída");
 
   return (
@@ -81,11 +81,11 @@ function AssetDetailDrawer({ assetId, onClose, onOpenWO }) {
         <div className="ad-head">
           <div className="ad-head-l">
             <div className="ad-id mono">{asset.id}</div>
-            <div className="ad-name">{asset.name}</div>
+            <div className="ad-name">{asset.nome}</div>
             <div className="ad-meta">
               <span>{asset.area}</span>
               <span className="dot-sep">·</span>
-              <span>Criticidade <b>{asset.criticality}</b></span>
+              <span>Criticidade <b>{asset.criticidade}</b></span>
               <span className="dot-sep">·</span>
               <span>Instalado 2019</span>
             </div>
@@ -100,12 +100,12 @@ function AssetDetailDrawer({ assetId, onClose, onOpenWO }) {
         <div className="ad-body scroll">
           {/* Status hero */}
           <div className="ad-hero">
-            <HealthGauge value={asset.health} tone={tone} />
+            <HealthGauge value={asset.saude} tone={tone} />
             <div className="ad-hero-stats">
               <ADStat label="Disponibilidade" value={`${asset.runtime}%`} bar={asset.runtime / 100} tone="accent" />
               <ADStat label="MTBF" value={`${asset.mtbf}h`} sub="Tempo médio entre falhas" mono />
-              <ADStat label="MTTR" value={`${(2.4 + (1 - asset.health) * 2).toFixed(1)}h`} sub="Tempo médio de reparo" mono />
-              <ADStat label="OS abertas" value={openWos.length} sub={openWos.length === 0 ? "Sem pendências" : `${openWos.filter(w => w.priority === "Crítica").length} crítica(s)`} mono />
+              <ADStat label="MTTR" value={`${(2.4 + (1 - asset.saude) * 2).toFixed(1)}h`} sub="Tempo médio de reparo" mono />
+              <ADStat label="OS abertas" value={openWos.length} sub={openWos.length === 0 ? "Sem pendências" : `${openWos.filter(w => w.prioridade === "Crítica").length} crítica(s)`} mono />
             </div>
           </div>
 
@@ -145,14 +145,14 @@ function AssetDetailDrawer({ assetId, onClose, onOpenWO }) {
               </div>
               <div className="ad-comp-list">
                 {components.map((c) => {
-                  const t = c.health > 0.8 ? "good" : c.health > 0.6 ? "warn" : "crit";
+                  const t = c.saude > 0.8 ? "good" : c.saude > 0.6 ? "warn" : "crit";
                   return (
                     <div key={c.name} className="ad-comp">
                       <div className="ad-comp-h">
                         <span className="ad-comp-name">{c.name}</span>
-                        <span className="mono ad-comp-pct" data-tone={t}>{Math.round(c.health * 100)}%</span>
+                        <span className="mono ad-comp-pct" data-tone={t}>{Math.round(c.saude * 100)}%</span>
                       </div>
-                      <div className="bar" data-tone={t}><i style={{ width: `${c.health * 100}%` }} /></div>
+                      <div className="bar" data-tone={t}><i style={{ width: `${c.saude * 100}%` }} /></div>
                       <div className="ad-comp-meta">Última inspeção · {c.last}</div>
                     </div>
                   );
@@ -175,7 +175,7 @@ function AssetDetailDrawer({ assetId, onClose, onOpenWO }) {
                     </div>
                     <div className="ad-tl-body">
                       <div className="ad-tl-h">
-                        <span className="ad-tl-title">{ev.title}</span>
+                        <span className="ad-tl-title">{ev.titulo}</span>
                         <span className="mono ad-tl-day">D-{89 - ev.day}</span>
                       </div>
                       <div className="ad-tl-note">{ev.note}</div>
@@ -210,16 +210,16 @@ function AssetDetailDrawer({ assetId, onClose, onOpenWO }) {
                 {wos.map(w => (
                   <tr key={w.id}>
                     <td className="mono">{w.id}</td>
-                    <td>{w.title}</td>
-                    <td><span className="pill" data-tone={tonePriority(w.priority)}>{w.priority}</span></td>
+                    <td>{w.titulo}</td>
+                    <td><span className="pill" data-tone={tonePriority(w.prioridade)}>{w.prioridade}</span></td>
                     <td><span className="pill pill-soft">{w.status}</span></td>
                     <td>
-                      {w.assigneeName ? (
+                      {w.tecnicoNome ? (
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <span className="avatar avatar-xs" style={{ background: TECHNICIANS.find(t => t.id === w.assignee)?.color }}>
-                            {TECHNICIANS.find(t => t.id === w.assignee)?.initials}
+                          <span className="avatar avatar-xs" style={{ background: TECHNICIANS.find(t => t.id === w.tecnico)?.color }}>
+                            {TECHNICIANS.find(t => t.id === w.tecnico)?.initials}
                           </span>
-                          <span style={{ fontSize: 12 }}>{w.assigneeName}</span>
+                          <span style={{ fontSize: 12 }}>{w.tecnicoNome}</span>
                         </div>
                       ) : <span className="ink-3" style={{ fontSize: 12 }}>—</span>}
                     </td>

@@ -5,7 +5,7 @@ function ScheduleScreen() {
   const typeTone = { preventiva: "info", preditiva: "pred", corretiva: "crit" };
 
   const totalByDay = SCHEDULE_DAYS.map((_, di) =>
-    PLANNED.filter(p => p.day === di).reduce((s, p) => s + p.duration, 0)
+    PLANNED.filter(p => p.day === di).reduce((s, p) => s + p.duracao, 0)
   );
 
   return (
@@ -68,16 +68,16 @@ function ScheduleScreen() {
               <div className="week-col-items">
                 {items.length === 0 && <div className="week-empty">—</div>}
                 {items.map((p, i) => {
-                  const asset = ASSETS.find(a => a.id === p.asset);
+                  const asset = ASSETS.find(a => a.id === p.equipamento);
                   return (
-                    <div key={i} className="week-item" data-tone={typeTone[p.type]}>
+                    <div key={i} className="week-item" data-tone={typeTone[p.tipo]}>
                       <div className="week-item-h">
-                        <span className="mono">{p.asset}</span>
-                        <span className="mono ink-3">{p.duration}h</span>
+                        <span className="mono">{p.equipamento}</span>
+                        <span className="mono ink-3">{p.duracao}h</span>
                       </div>
-                      <div className="week-item-title">{p.title}</div>
+                      <div className="week-item-title">{p.titulo}</div>
                       <div className="week-item-meta">
-                        <span className="pill" data-tone={typeTone[p.type]}>{p.type}</span>
+                        <span className="pill" data-tone={typeTone[p.tipo]}>{p.tipo}</span>
                         <span className="ink-3">{asset?.area}</span>
                       </div>
                     </div>

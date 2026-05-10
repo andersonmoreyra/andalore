@@ -1,7 +1,61 @@
-COMO PUBLICAR NO GITHUB PAGES
-1. Descompacte o ZIP.
-2. Envie todos os arquivos para um repositório GitHub.
-3. Vá em Settings > Pages.
-4. Em Branch, selecione main e /root.
-5. Aguarde o GitHub gerar o link.
-6. Abra o site e faça login com anderson@marvi.com / admin123.
+INSTALAÇÃO - Sistema de Gestão de Manutenção v3.0
+
+═══════════════════════════════════════════════════════════
+
+1. EXTRAIR ARQUIVOS
+   - Descompacte este ZIP
+   - Você terá 34 arquivos
+
+2. UPLOAD NO GITHUB
+   - Acesse seu repositório "andalore"
+   - Delete arquivos antigos (opcional)
+   - Add file → Upload files
+   - Arraste TODOS os 34 arquivos
+   - Commit changes
+
+3. AGUARDAR
+   - Espere 30-60 segundos
+   - GitHub Pages precisa publicar
+
+4. ACESSAR
+   - https://andersonmoreyra.github.io/andalore/
+   - Recarregue com Ctrl+Shift+R
+
+5. LOGIN
+   Admin: anderson@marvi.com / admin123
+   Coord: fabio@marvi.com / coord123
+
+═══════════════════════════════════════════════════════════
+
+FUNCIONALIDADES IMPLEMENTADAS:
+
+✓ Login e autenticação
+✓ Criar OS
+✓ Editar OS
+✓ Deletar OS
+✓ Templates de Checklist
+✓ Executar Checklist em OS
+✓ Gestão de Técnicos
+✓ Gestão de Solicitações
+✓ Gestão de Ativos
+✓ Gestão de Peças/Estoque
+✓ Backup/Restauração
+✓ Dashboard com KPIs
+✓ Filtros e busca
+
+═══════════════════════════════════════════════════════════
+
+TESTAR NESTA ORDEM:
+
+1. Login
+2. Ordens → Nova OS → Criar
+3. Clique na OS → Editar
+4. Clique na OS → Checklist
+5. Configurações → Templates de Checklist
+6. Configurações → Equipe
+7. Solicitações → Nova solicitação
+8. Estoque → Peças → Nova peça
+9. Estoque → Equipamentos → Novo ativo
+10. Configurações → Backup → Exportar
+
+═══════════════════════════════════════════════════════════
