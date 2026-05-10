@@ -1,0 +1,247 @@
+// ─── Tela: Ordens de serviço (lista + detalhe) ───────────────────────────────
+
+function WorkOrdersScreen({ selectedId, onSelect }) {
+  const [filter, setFilter] = React.useState("todas");
+  const [search, setSearch] = React.useState("");
+
+  const filters = [
+    { id: "todas", label: "Todas", count: WORK_ORDERS.length },
+    { id: "executando", label: "Em execução", count: WORK_ORDERS.filter(w => w.status === "executando").length },
+    { id: "aberta", label: "Abertas", count: WORK_ORDERS.filter(w => w.status === "aberta").length },
+    { id: "aguardando", label: "Aguardando peça", count: WORK_ORDERS.filter(w => w.status === "aguardando peça").length },
+    { id: "atrasadas", label: "Atrasadas", count: 3 },
+  ];
+
+  const items = WORK_ORDERS.filter((w) => {
+    if (filter === "executando" && w.status !== "executando") return false;
+    if (filter === "aberta" && w.status !== "aberta") return false;
+    if (filter === "aguardando" && w.status !== "aguardando peça") return false;
+    if (filter === "atrasadas" && w.sla < 0.7) return false;
+    if (search && !(`${w.id} ${w.title} ${w.assetName}`.toLowerCase().includes(search.toLowerCase()))) return false;
+    return true;
+  });
+
+  const selected = WORK_ORDERS.find(w => w.id === selectedId) || items[0];
+
+  return (
+    <div className="wo-screen">
+      {/* Lista */}
+      <div className="wo-list-pane">
+        <div className="wo-list-head">
+          <h1 className="screen-title">Ordens de serviço</h1>
+          <div className="wo-list-actions">
+            <div className="search">
+              {I.search}
+              <input placeholder="Buscar por OS, ativo, técnico…"
+                     value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <button className="btn">{I.filter}<span>Filtros</span></button>
+            <button className="btn btn-primary">{I.plus}<span>Nova OS</span></button>
+          </div>
+        </div>
+        <div className="wo-tabs">
+          {filters.map((f) => (
+            <button key={f.id} className="wo-tab" data-active={filter === f.id}
+                    onClick={() => setFilter(f.id)}>
+              <span>{f.label}</span>
+              <span className="wo-tab-count mono">{f.count}</span>
+            </button>
+          ))}
+        </div>
+        <div className="wo-list scroll">
+          <div className="wo-list-header">
+            <span>OS</span>
+            <span>Título / Ativo</span>
+            <span>Tipo</span>
+            <span>Prioridade</span>
+            <span>Responsável</span>
+            <span>SLA</span>
+            <span>Prazo</span>
+          </div>
+          {items.map((w) => (
+            <button key={w.id} className="wo-row" data-active={selected?.id === w.id}
+                    onClick={() => onSelect(w.id)}>
+              <span className="mono wo-cell-id">{w.id}</span>
+              <span className="wo-cell-title">
+                <span className="wo-title-main">{w.title}</span>
+                <span className="wo-title-asset">
+                  <span className="mono">{w.asset}</span> · {w.assetName}
+                </span>
+              </span>
+              <span><span className="pill" data-tone={toneType(w.type)}>{w.type}</span></span>
+              <span><span className="pill" data-tone={tonePriority(w.priority)}>
+                <span className="dot" />{w.priority}
+              </span></span>
+              <span className="wo-cell-assignee">
+                {w.assignee ? (
+                  <>
+                    <span className="avatar avatar-xs"
+                          style={{ background: TECHNICIANS.find(t => t.id === w.assignee)?.color }}>
+                      {TECHNICIANS.find(t => t.id === w.assignee)?.initials}
+                    </span>
+                    <span>{w.assigneeName.split(" ")[0]}</span>
+                  </>
+                ) : <span className="ink-3">Não atribuído</span>}
+              </span>
+              <span className="wo-cell-sla">
+                <div className="bar bar-sm" data-tone={w.sla > 0.7 ? "crit" : w.sla > 0.4 ? "warn" : "good"}>
+                  <i style={{ width: `${w.sla * 100}%` }} />
+                </div>
+                <span className="mono">{Math.round(w.sla * 100)}%</span>
+              </span>
+              <span className="mono ink-2">{w.due.split(" ")[1]}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Detalhe */}
+      {selected && <WorkOrderDetail wo={selected} />}
+    </div>
+  );
+}
+
+function WorkOrderDetail({ wo }) {
+  const tech = TECHNICIANS.find(t => t.id === wo.assignee);
+  const pct = wo.estimate > 0 ? Math.min(100, (wo.elapsed / wo.estimate) * 100) : 0;
+  const status = statusLabel[wo.status] || { label: wo.status, tone: "neutral" };
+
+  return (
+    <div className="wo-detail scroll">
+      <div className="wo-detail-head">
+        <div className="wo-detail-meta">
+          <span className="mono wo-detail-id">{wo.id}</span>
+          <span className="pill" data-tone={status.tone}><span className="dot" />{status.label}</span>
+          <span className="pill" data-tone={tonePriority(wo.priority)}>
+            <span className="dot" />{wo.priority}
+          </span>
+          <span className="pill" data-tone={toneType(wo.type)}>{wo.type}</span>
+        </div>
+        <div className="wo-detail-actions">
+          <button className="btn">{I.pin}<span>Fixar</span></button>
+          <button className="btn">{I.more}</button>
+        </div>
+      </div>
+      <h2 className="wo-detail-title">{wo.title}</h2>
+      <div className="wo-detail-asset">
+        <span style={{ color: "var(--ink-3)" }}>{I.asset}</span>
+        <span className="mono">{wo.asset}</span>
+        <span>·</span>
+        <span>{wo.assetName}</span>
+        <span style={{ color: "var(--ink-4)" }}>·</span>
+        <span style={{ color: "var(--ink-3)" }}>{wo.area}</span>
+      </div>
+
+      {/* Cronômetro grande */}
+      <div className="wo-timer">
+        <div className="wo-timer-block">
+          <div className="wo-timer-label">Decorrido</div>
+          <div className="wo-timer-value mono">{fmtMin(wo.elapsed)}</div>
+        </div>
+        <div className="wo-timer-bar">
+          <div className="bar bar-lg" data-tone={pct > 90 ? "crit" : pct > 70 ? "warn" : "accent"}>
+            <i style={{ width: `${pct}%` }} />
+          </div>
+          <div className="wo-timer-bar-meta">
+            <span className="mono">{Math.round(pct)}% do estimado</span>
+            <span className="mono">restante: {fmtMin(Math.max(0, wo.estimate - wo.elapsed))}</span>
+          </div>
+        </div>
+        <div className="wo-timer-block">
+          <div className="wo-timer-label">Estimado</div>
+          <div className="wo-timer-value mono">{fmtMin(wo.estimate)}</div>
+        </div>
+      </div>
+
+      {/* Impacto */}
+      <div className={`wo-impact ${wo.impact.includes("R$") ? "wo-impact-crit" : ""}`}>
+        <span style={{ color: "var(--crit)" }}>{I.alert}</span>
+        <span>{wo.impact}</span>
+      </div>
+
+      <div className="wo-detail-grid">
+        <Section label="Descrição">
+          <p className="wo-desc">{wo.description}</p>
+        </Section>
+
+        <Section label="Responsável">
+          {tech ? (
+            <div className="wo-tech-card">
+              <div className="avatar avatar-lg" style={{ background: tech.color }}>{tech.initials}</div>
+              <div>
+                <div className="wo-tech-name">{tech.name}</div>
+                <div className="wo-tech-role">{tech.role} · <span className="mono">{tech.id}</span></div>
+              </div>
+              <button className="btn btn-mini" style={{ marginLeft: "auto" }}>Reatribuir</button>
+            </div>
+          ) : (
+            <button className="btn btn-accent">{I.plus}<span>Atribuir técnico</span></button>
+          )}
+        </Section>
+
+        <Section label="Datas">
+          <dl className="wo-dl">
+            <dt>Aberta</dt><dd className="mono">{wo.opened}</dd>
+            <dt>Prazo</dt><dd className="mono">{wo.due}</dd>
+            <dt>Estimativa</dt><dd className="mono">{fmtMin(wo.estimate)}</dd>
+          </dl>
+        </Section>
+
+        <Section label={`Peças & materiais (${wo.parts.length})`}>
+          {wo.parts.length === 0 ? (
+            <div className="ink-3" style={{ fontSize: 12 }}>Nenhum material requerido.</div>
+          ) : (
+            <table className="parts-table">
+              <thead>
+                <tr><th>Código</th><th>Descrição</th><th>Qtd</th><th>Estoque</th><th></th></tr>
+              </thead>
+              <tbody>
+                {wo.parts.map((p) => (
+                  <tr key={p.code}>
+                    <td className="mono">{p.code}</td>
+                    <td>{p.name}</td>
+                    <td className="mono">{p.qty}</td>
+                    <td className={`mono ${p.stock < p.qty ? "ink-crit" : ""}`}>{p.stock}</td>
+                    <td>
+                      {p.stock < p.qty
+                        ? <span className="pill" data-tone="crit">sem estoque</span>
+                        : <span className="pill" data-tone="good">disponível</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Section>
+
+        <Section label="Checklist (3/5)">
+          <div className="checklist">
+            {[
+              { done: true, text: "LOTO aplicado e validado" },
+              { done: true, text: "Permissão de trabalho a quente" },
+              { done: true, text: "Inspeção visual do componente" },
+              { done: false, text: "Substituição do rolamento" },
+              { done: false, text: "Teste de vibração ≤ 2.5 mm/s" },
+            ].map((c, i) => (
+              <div key={i} className="check-row" data-done={c.done}>
+                <span className="check-box">{c.done ? I.check : null}</span>
+                <span>{c.text}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+      </div>
+    </div>
+  );
+}
+
+function Section({ label, children }) {
+  return (
+    <div className="wo-section">
+      <div className="wo-section-label">{label}</div>
+      {children}
+    </div>
+  );
+}
+
+window.WorkOrdersScreen = WorkOrdersScreen;
