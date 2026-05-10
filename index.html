@@ -22,6 +22,10 @@
 <body>
   <div id="root"></div>
 
+  <!-- Carregar sistema de dados e autenticação PRIMEIRO -->
+  <script src="storage.js"></script>
+  <script src="auth.js"></script>
+
   <!-- Carregar todos os componentes na ordem correta -->
   <script type="text/babel" src="data.jsx"></script>
   <script type="text/babel" src="icons.jsx"></script>

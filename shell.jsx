@@ -115,7 +115,14 @@ function TopBar({ accent }) {
           {I.bell}
           {unread > 0 && <span className="bell-badge">{unread}</span>}
         </button>
-        <div className="avatar" style={{ background: accent }}>FA</div>
+        <div className="topbar-user">
+          <div className="avatar" style={{ background: accent }} title={Storage.getCurrentUser()?.nome}>
+            {Storage.getCurrentUser()?.avatar || 'U'}
+          </div>
+          <button className="btn-logout" onClick={() => Auth.logout()} title="Sair do sistema">
+            🚪
+          </button>
+        </div>
 
         {notifOpen && (
           <div className="notif-pop" role="dialog">

@@ -13,6 +13,13 @@ function App() {
   const [selectedWO, setSelectedWO] = React.useState("OS-2839");
   const [assetDetail, setAssetDetail] = React.useState(null);
 
+  // Verificar autenticação ao montar o componente
+  React.useEffect(() => {
+    if (!Auth.checkAuth()) {
+      return; // Auth.checkAuth() já mostra a tela de login
+    }
+  }, []);
+
   // Aplica tema/densidade no <html>
   React.useEffect(() => {
     const root = document.documentElement;

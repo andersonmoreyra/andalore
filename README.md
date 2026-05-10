@@ -1,27 +1,36 @@
-# Sistema de Gestão de Manutenção - Marvi Alimentos
+# Sistema de Gestão de Manutenção - Marvi Alimentos v2.0
 
-Sistema completo de gestão de manutenção industrial desenvolvido para a Marvi Alimentos.
+✅ **NOVIDADES NESTA VERSÃO:**
+- Sistema de Login e Autenticação
+- Gerenciamento de Dados com LocalStorage
+- Níveis de Acesso (Admin, Coordenador, Técnico, Visualizador)
+- Base pronta para funcionalidades completas
 
 ## 🚀 Como usar
 
-Acesse: https://seu-usuario.github.io/sistema-manutencao/
+1. Acesse: https://seu-usuario.github.io/sistema-manutencao/
+2. Faça login com uma das contas demonstração:
+   - **Admin:** anderson@marvi.com / admin123
+   - **Coordenador:** fabio@marvi.com / coord123
 
-## ⚙️ Funcionalidades
+## 📦 Arquivos Novos
 
-- 📊 Dashboard em tempo real
-- 📋 Gestão de ordens de serviço
-- 👥 Controle de equipe
-- 🏭 Monitoramento de ativos
-- 📅 Agenda de manutenções
-- 📦 Controle de estoque
-- 📈 Relatórios e indicadores
+- **storage.js** - Gerenciamento de dados LocalStorage
+- **auth.js** - Sistema de autenticação e login
+- **index.html** - Atualizado para carregar os novos arquivos
+- **app.jsx** - Atualizado com verificação de autenticação
+- **shell.jsx** - Atualizado com botão de logout
+- **tokens.css** - Atualizado com estilos de login/logout
 
-## 🛠️ Tecnologias
+## ⚙️ Próximos Módulos
 
-- React 18
-- CSS customizado
-- GitHub Pages
+- [ ] Nova OS funcional
+- [ ] Filtros funcionais
+- [ ] Checklists editáveis
+- [ ] Cadastro de técnicos
+- [ ] Gestão de solicitações
+- [ ] Exportações
 
 ---
 
-Desenvolvido para coordenação de manutenção industrial
+Desenvolvido para Marvi Alimentos - Planta Ourinhos
