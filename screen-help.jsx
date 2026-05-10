@@ -1,0 +1,1 @@
+function ScreenHelp(){return <div className="card"><h2>Testes rápidos</h2><ol><li>Criar OS com Ctrl+K ou botão Nova OS.</li><li>Editar e deletar OS.</li><li>Converter solicitação em OS.</li><li>Adicionar ativo e peça.</li><li>Exportar CSV e backup JSON.</li></ol></div>}

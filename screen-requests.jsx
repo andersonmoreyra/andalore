@@ -1,5 +1,1 @@
-function RequestsScreen() {
-  return <RequestsManager />;
-}
-
-window.RequestsScreen = RequestsScreen;
+function ScreenRequests(){return <RequestsManager/>}

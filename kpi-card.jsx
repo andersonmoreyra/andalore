@@ -1,0 +1,3 @@
+function StatusPill({value}){const v=String(value||'').toLowerCase();const cls=v.includes('concl')||v.includes('dispon')?'good':v.includes('alta')||v.includes('pend')||v.includes('exec')?'warn':v.includes('crit')||v.includes('aus')||v.includes('baixo')?'crit':'';return <span className={`pill ${cls}`}>{value||'—'}</span>}
+function EmptyState({text='Nenhum registro encontrado'}){return <div className="empty">{text}</div>}
+function KpiCard({title,value,trend}){return <div className="card kpi"><div><div className="muted">{title}</div><strong>{value}</strong>{trend&&<div className="tiny">{trend}</div>}</div><div style={{width:100,color:'var(--accent)'}}><Sparkline values={[2,3,2,5,4,6,5]}/></div></div>}
