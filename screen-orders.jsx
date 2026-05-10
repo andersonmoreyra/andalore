@@ -115,7 +115,17 @@ function WorkOrdersScreen({ selectedId, onSelect }) {
       </div>
 
       {/* Detalhe */}
-      {selected && <WorkOrderDetail wo={selected} />}
+      {selected ? (
+        <WorkOrderDetail wo={selected} />
+      ) : (
+        <div className="wo-detail scroll" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '16px', color: 'var(--ink-3)' }}>
+          <div style={{ fontSize: '48px', opacity: 0.3 }}>📋</div>
+          <div style={{ fontSize: '14px' }}>Nenhuma ordem de serviço encontrada</div>
+          <button className="btn btn-primary" onClick={() => window.dispatchEvent(new CustomEvent("__open_new_wo"))}>
+            {I.plus}<span>Criar primeira OS</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
